@@ -1,5 +1,12 @@
 <template>
 <div class="table" ref="root" :style="rootStyle">
+  <button
+      v-for="pagination in paginationOptions"
+      :key="pagination"
+      @click="changePaginationType(pagination)"
+  >
+    {{ pagination }}
+  </button>
   <table ref="viewport" :style="viewportStyle">
     <thead ref="header">
     <table-row>
@@ -99,7 +106,12 @@ export default {
       rowHeight: 30,
       scrollTop: 0,
       nodePadding: 20,
-      headerHeight: 0
+      headerHeight: 0,
+      paginationOptions: [
+        PaginationType.Pagination,
+        PaginationType.InfiniteScroll,
+        PaginationType.VirtualScroll
+      ]
     }
   },
 
@@ -185,29 +197,41 @@ export default {
     sort: {
       handler: 'emitSortUpdate',
       deep: true
+    },
+
+    paginationType: function (newValue) {
+      if (newValue === PaginationType.VirtualScroll) this.initVirtualScroll();
     }
   },
 
   mounted () {
     if (!this.virtualScrollOn) return;
 
-    this.$refs.root.addEventListener(
-        "scroll",
-        this.handleScroll
-    );
-    // Calculate that initial row height dynamically
-    const largestHeight = this.calculateInitialRowHeight();
-    this.rowHeight = largestHeight !== undefined ? largestHeight : this.rowHeight;
-    this.headerHeight = this.$refs.header.offsetHeight;
+    this.initVirtualScroll();
   },
 
   destroyed() {
     if (!this.virtualScrollOn) return;
 
-    this.$refs.root.removeEventListener("scroll", this.handleScroll);
+    this.destroyVirtualScroll();
   },
 
   methods: {
+    destroyVirtualScroll () {
+      this.$refs.root.removeEventListener("scroll", this.handleScroll);
+    },
+
+    initVirtualScroll () {
+      this.$refs.root.addEventListener(
+          "scroll",
+          this.handleScroll
+      );
+      // Calculate that initial row height dynamically
+      const largestHeight = this.calculateInitialRowHeight();
+      this.rowHeight = largestHeight !== undefined ? largestHeight : this.rowHeight;
+      this.headerHeight = this.$refs.header.offsetHeight;
+    },
+
     emitSortUpdate () {
       this.$emit('update:sort', {
         field: this.sort.field,
@@ -275,6 +299,16 @@ export default {
       }
 
       return largestHeight;
+    },
+
+    changePaginationType (pagination) {
+      if (pagination === this.paginationType) return;
+
+      if (this.paginationType === PaginationType.VirtualScroll) {
+        this.destroyVirtualScroll();
+      }
+
+      this.$emit('change-pagination-type', pagination);
     }
   }
 };

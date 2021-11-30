@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <common-components-view/>
-<!--    <functional-components-view/>-->
+<!--    <common-components-view/>-->
+    <functional-components-view/>
   </div>
 </template>
 
 <script>
-import CommonComponentsView from './components/views/CommonComponentsView';
-// import FunctionalComponentsView from './components/views/FunctionalComponentsView';
+// import CommonComponentsView from './components/views/CommonComponentsView';
+import FunctionalComponentsView from './components/views/FunctionalComponentsView';
 
 export default {
   name: 'App',
   components: {
-    // FunctionalComponentsView,
-    CommonComponentsView
+    FunctionalComponentsView,
+    // CommonComponentsView
   }
 }
 </script>

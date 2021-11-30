@@ -11,6 +11,7 @@
       :pagination-type="paginationType"
       @get-page="getPage"
       @get-infinite-next-page="getInfiniteNextPage"
+      @change-pagination-type="changePaginationType"
       @update:sort="handleSortUpdate"
       @update:filter="handleFilterUpdate"
   />
@@ -129,6 +130,12 @@ export default {
 
       this.currentPage = 1;
       this.loadData(result);
+    },
+
+    changePaginationType (pagination) {
+      this.paginationType = pagination;
+      this.currentPage = 1;
+      this.loadData([...mockData]);
     }
   }
 }
